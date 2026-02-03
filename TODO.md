@@ -1,0 +1,2 @@
+- [x] Rewrite resources/views/admin/schedule.blade.php to be responsive: button above table inside form, mobile swipe, sticky name column, hint, overflow-x-auto, touch-pan-x, min-width 900px
+- [x] Rewrite resources/views/admin/schedule-matrix.blade.php to be responsive: desktop table, mobile cards per staff, shift badges (OFF gray, O green, C blue), sticky name, responsive week picker
