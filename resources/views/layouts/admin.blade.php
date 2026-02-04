@@ -71,7 +71,8 @@
 
             {{-- GENERAL --}}
             <div>
-                <p class="text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+
                     General
                 </p>
 
@@ -87,7 +88,8 @@
                 {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
 
                         <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span>{{ $m[0] }}</span>
+                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
+
 
                     </a>
                 @endforeach
@@ -95,7 +97,8 @@
 
             {{-- OPERASIONAL --}}
             <div>
-                <p class="text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+
                     Operasional
                 </p>
 
@@ -116,7 +119,8 @@
                 {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
 
                         <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span>{{ $m[0] }}</span>
+                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
+
 
                     </a>
                 @endforeach
@@ -124,7 +128,8 @@
 
             {{-- PAYROLL --}}
             <div>
-                <p class="text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+
                     Payroll
                 </p>
 
@@ -144,7 +149,8 @@
                 {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
 
                         <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span>{{ $m[0] }}</span>
+                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
+
 
                     </a>
                 @endforeach
@@ -238,20 +244,45 @@ text-white flex items-center justify-center">
         </main>
 
     </div>
+    <style>
+        /* Hide text + section when collapsed */
+        .collapsed .sidebar-text {
+            display: none;
+        }
+
+        .collapsed .sidebar-section {
+            display: none;
+        }
+
+        /* Center icons when collapsed */
+        .collapsed .menu-item {
+            justify-content: center;
+        }
+
+        .collapsed .menu-item i {
+            margin-right: 0;
+        }
+    </style>
 
     <script>
+        /* ================= PROFILE DROPDOWN ================= */
         const profileBtn = document.getElementById('profileBtn')
         const profileMenu = document.getElementById('profileMenu')
 
-        profileBtn.onclick = () => profileMenu.classList.toggle('hidden')
+        if (profileBtn) {
+            profileBtn.onclick = () => profileMenu.classList.toggle('hidden')
 
-        document.addEventListener('click', e => {
-            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target))
-                profileMenu.classList.add('hidden')
-        })
+            document.addEventListener('click', e => {
+                if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                    profileMenu.classList.add('hidden')
+                }
+            })
+        }
 
+        /* ================= LUCIDE INIT ================= */
         lucide.createIcons()
 
+        /* ================= SIDEBAR ================= */
         const sidebar = document.getElementById('sidebar')
         const wrapper = document.getElementById('wrapper')
         const toggle = document.getElementById('toggle')
@@ -260,13 +291,14 @@ text-white flex items-center justify-center">
 
         let collapsed = localStorage.getItem('sb') === '1'
 
-        function mobile() {
+        function isMobile() {
             return window.innerWidth < 768
         }
 
-        function sync() {
+        /* Apply current state */
+        function syncSidebar() {
 
-            if (mobile()) {
+            if (isMobile()) {
                 sidebar.classList.add('-translate-x-full')
                 overlay.classList.add('hidden')
                 icon.dataset.lucide = 'menu'
@@ -289,21 +321,29 @@ text-white flex items-center justify-center">
             lucide.createIcons()
         }
 
+        /* Toggle button */
         toggle.onclick = () => {
 
-            if (mobile()) {
+            /* MOBILE */
+            if (isMobile()) {
                 sidebar.classList.toggle('-translate-x-full')
                 overlay.classList.toggle('hidden')
-                icon.dataset.lucide = sidebar.classList.contains('-translate-x-full') ? 'menu' : 'x'
+
+                icon.dataset.lucide = sidebar.classList.contains('-translate-x-full') ?
+                    'menu' :
+                    'x'
+
                 lucide.createIcons()
                 return
             }
 
+            /* DESKTOP */
             collapsed = !collapsed
             localStorage.setItem('sb', collapsed ? '1' : '0')
-            sync()
+            syncSidebar()
         }
 
+        /* Overlay click (mobile close) */
         overlay.onclick = () => {
             sidebar.classList.add('-translate-x-full')
             overlay.classList.add('hidden')
@@ -311,13 +351,18 @@ text-white flex items-center justify-center">
             lucide.createIcons()
         }
 
-        window.addEventListener('resize', sync)
-        sync()
+        /* Resize listener */
+        window.addEventListener('resize', syncSidebar)
 
+        /* Initial sync */
+        syncSidebar()
+
+        /* ================= PWA ================= */
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("/sw.js");
+            navigator.serviceWorker.register("/sw.js")
         }
     </script>
+
 
 </body>
 
