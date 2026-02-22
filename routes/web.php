@@ -8,6 +8,18 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Inventory\WasteController;
+use App\Http\Controllers\Inventory\StockController;
+use App\Http\Controllers\Inventory\BantaiController;
+use App\Http\Controllers\Inventory\BarangMasukController;
+use App\Http\Controllers\Inventory\ReturController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\HistoryController;
+use App\Http\Controllers\Inventory\ChipController;
+use App\Http\Controllers\Inventory\ChipSaleController;
+use App\Http\Controllers\Inventory\ToppingChangeController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +138,23 @@ Route::middleware(['auth','role:admin'])
 
         })->name('admin.payroll.export');
 
+        /*
+|--------------------------------------------------------------------------
+| HISTORY INVENTORY ADMIN
+|--------------------------------------------------------------------------
+*/
+Route::get('/history',[HistoryController::class,'index']);
+
+/*
+|--------------------------------------------------------------------------
+| SUPPLIER ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/suppliers',[SupplierController::class,'index']);
+Route::post('/suppliers',[SupplierController::class,'store']);
+Route::delete('/suppliers/{id}',[SupplierController::class,'destroy']);
+
 
         /*
         | Attendance (Admin)
@@ -205,6 +234,31 @@ Route::middleware(['auth','role:admin'])
 
             return back()->with('success','Password staff berhasil direset ke staff123');
         });
+
+        Route::get('/staff/{id}/edit', function ($id) {
+
+            $staff = DB::table('users')->where('id',$id)->first();
+
+            return view('admin.staff-edit', compact('staff'));
+        });
+
+        Route::post('/staff/{id}/update', function (Request $request, $id) {
+
+            DB::table('users')
+                ->where('id',$id)
+                ->update([
+                    'name'=>$request->name,
+                    'email'=>$request->email,
+                    'employment_type'=>$request->employment_type,
+                    'weekday_rate'=>$request->weekday_rate,
+                    'weekend_rate'=>$request->weekend_rate,
+                    'updated_at'=>now()
+                ]);
+
+            return redirect('/admin/staff')->with('success','Staff berhasil diupdate');
+        });
+
+
 
         /*
         | SCHEDULE EDIT
@@ -504,10 +558,107 @@ Route::middleware(['auth','role:admin'])
 | STAFF PANEL (MOBILE WEB APP)
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth','role:staff'])
     ->prefix('staff')
     ->group(function () {
+
+    // INVENTORY MENU
+    Route::get('/inventory', function(){
+    return view('staff.inventory.index');
+})->name('staff.inventory');
+
+    // INVENTORY BOOK (MODAL FORM STYLE)
+Route::prefix('inventory')->group(function(){
+
+
+    // ================= WASTE =================
+    Route::get('/waste',[WasteController::class,'index'])
+        ->name('waste.index');
+
+    Route::post('/waste',[WasteController::class,'store'])
+        ->name('waste.store');
+
+    Route::delete('/waste/{id}',[WasteController::class,'destroy'])
+        ->name('waste.destroy');
+
+
+    // ================= RETUR =================
+    Route::get('/retur',[ReturController::class,'index'])
+        ->name('retur.index');
+
+    Route::post('/retur',[ReturController::class,'store'])
+        ->name('retur.store');
+
+    Route::delete('/retur/{id}',[ReturController::class,'destroy'])
+        ->name('retur.destroy');
+
+
+    // ================= STOCK =================
+    Route::get('/stock',[StockController::class,'index'])
+        ->name('stock.index');
+
+    Route::post('/stock',[StockController::class,'store'])
+        ->name('stock.store');
+
+    Route::delete('/stock/{id}',[StockController::class,'destroy'])
+        ->name('stock.destroy');
+
+
+    // ================= BANTAI =================
+    Route::get('/bantai',[BantaiController::class,'index'])
+        ->name('bantai.index');
+
+    Route::post('/bantai',[BantaiController::class,'store'])
+        ->name('bantai.store');
+
+    Route::delete('/bantai/{id}',[BantaiController::class,'destroy'])
+        ->name('bantai.destroy');
+
+
+    // ================= BARANG MASUK =================
+    Route::get('/barang-masuk',[BarangMasukController::class,'index'])
+        ->name('barangmasuk.index');
+
+    Route::post('/barang-masuk',[BarangMasukController::class,'store'])
+        ->name('barangmasuk.store');
+
+    Route::delete('/barang-masuk/{id}',[BarangMasukController::class,'destroy'])
+        ->name('barangmasuk.destroy');
+
+        // ================= CHIPS (MASTER) =================
+Route::get('/chips',[ChipController::class,'index'])
+    ->name('chips.index');
+
+Route::post('/chips',[ChipController::class,'store'])
+    ->name('chips.store');
+
+Route::delete('/chips/{id}',[ChipController::class,'destroy'])
+    ->name('chips.destroy');
+
+    Route::post('/chips-adjust/{id}',[ChipController::class,'adjustStock'])
+    ->name('chips.adjust');
+
+    // ================= CHIP SALES =================
+Route::get('/chips-sales',[ChipSaleController::class,'index'])
+    ->name('chips.sales.index');
+
+Route::post('/chips-sales',[ChipSaleController::class,'store'])
+    ->name('chips.sales.store');
+
+Route::delete('/chips-sales/{id}',[ChipSaleController::class,'destroy'])
+    ->name('chips.sales.destroy');
+
+    // ================= PERGANTIAN TOPPING =================
+Route::get('/topping-change',[ToppingChangeController::class,'index'])
+    ->name('topping-change.index');
+
+Route::post('/topping-change',[ToppingChangeController::class,'store'])
+    ->name('topping-change.store');
+
+Route::delete('/topping-change/{id}',[ToppingChangeController::class,'destroy'])
+    ->name('topping-change.destroy');
+
+});
 
         // Dashboard
         Route::get('/', function(){

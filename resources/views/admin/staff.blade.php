@@ -117,6 +117,12 @@
 
                                 <div class="flex justify-center gap-4">
 
+                                    {{-- EDIT --}}
+                                    <a href="/admin/staff/{{ $s->id }}/edit"
+                                        class="text-gray-500 hover:text-gray-800">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    </a>
+
                                     {{-- RESET --}}
                                     <form method="POST" action="/admin/staff/reset-password/{{ $s->id }}"
                                         onsubmit="return confirm('Reset password ke staff123?')">
@@ -178,6 +184,10 @@
                     </div>
 
                     <div class="flex gap-4 pt-3">
+
+                        <a href="/admin/staff/{{ $s->id }}/edit" class="text-gray-500">
+                            <i data-lucide="pencil" class="w-5 h-5"></i>
+                        </a>
 
                         <form method="POST" action="/admin/staff/reset-password/{{ $s->id }}">
                             @csrf

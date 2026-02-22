@@ -34,7 +34,7 @@
         </div>
 
         {{-- DELETE ACCOUNT --}}
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+        {{-- <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
 
             <h3 class="font-medium mb-3 text-sm text-red-600 dark:text-red-400">
                 Hapus Akun
@@ -42,7 +42,7 @@
 
             @include('profile.partials.delete-user-form')
 
-        </div>
+        </div> --}}
 
     </div>
 @endsection

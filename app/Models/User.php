@@ -42,4 +42,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function wastes()
+{
+    return $this->hasMany(WasteLog::class);
 }
+
+public function stocks()
+{
+    return $this->hasMany(StockLog::class);
+}
+
+public function bantais()
+{
+    return $this->hasMany(BantaiLog::class);
+}
+
+}
+

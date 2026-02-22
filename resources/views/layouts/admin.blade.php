@@ -2,8 +2,8 @@
 <html lang="id">
 
 <head>
-    <link rel="manifest" href="/manifest.json">
 
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#16a34a">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,36 +14,79 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        .menu-active {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
-            color: white;
-            box-shadow: 0 10px 25px #22c55e66
+        /* ================= ULTRA PREMIUM STYLE ================= */
+
+        body {
+            opacity: 0;
+            transform: translateY(6px);
+            transition: .25s ease;
         }
 
+        body.page-loaded {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* GLASS SIDEBAR */
+        #sidebar {
+            background: rgba(255, 255, 255, .85);
+            backdrop-filter: blur(18px);
+            border-right: 1px solid #f1f5f9;
+        }
+
+        /* HEADER DEPTH */
+        header {
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+        }
+
+        /* MENU */
         .menu-item {
-            transition: .25s
+            transition: .25s;
+            border: 1px solid transparent;
         }
 
         .menu-item:hover {
-            transform: translateX(6px)
+            transform: translateX(6px);
+            background: #f0fdf4;
+            border-color: #22c55e22;
+        }
+
+        .menu-item i {
+            transition: .25s;
         }
 
         .menu-item:hover i {
-            transform: scale(1.15)
+            transform: scale(1.15);
         }
 
+        .menu-active {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 8px 20px #22c55e33;
+        }
+
+        /* AVATAR */
         .avatar-ring {
-            box-shadow: 0 0 0 3px white, 0 0 0 6px #22c55e55
+            box-shadow:
+                0 0 0 3px white,
+                0 0 0 6px #22c55e33,
+                0 10px 25px #22c55e22;
         }
 
-        .collapsed .sidebar-text {
-            display: none
+        /* COLLAPSE */
+        .collapsed .sidebar-text,
+        .collapsed .sidebar-section {
+            display: none;
+        }
+
+        .collapsed .menu-item {
+            justify-content: center;
         }
 
         .brand {
             font-weight: 700;
             font-size: 20px;
-            letter-spacing: -.5px
         }
     </style>
 
@@ -53,123 +96,66 @@
 
     <div id="overlay" class="fixed inset-0 bg-black/40 hidden z-30"></div>
 
-    {{-- SIDEBAR --}}
+    <!-- ================= SIDEBAR ================= -->
     <aside id="sidebar"
-        class="fixed top-0 left-0 h-screen w-64 bg-white border-r z-40 flex flex-col
+        class="fixed top-0 left-0 h-screen w-64 z-40 flex flex-col
 -translate-x-full md:translate-x-0 transition-all duration-300">
 
-        {{-- BRAND --}}
         <div class="h-16 border-b flex items-center px-5 gap-2">
-
             <span class="text-2xl">🥑</span>
             <span class="brand sidebar-text">Avocado Lovers</span>
-
         </div>
 
-        {{-- MENU --}}
-        <nav class="flex-1 px-4 py-6 text-sm space-y-6">
+        <nav class="flex-1 overflow-y-auto px-4 py-6 text-sm space-y-6">
 
-            {{-- GENERAL --}}
-            <div>
-                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+            @php
+                $general = [['Dashboard', 'layout-dashboard', 'admin'], ['Data Staff', 'users', 'admin/staff']];
+                $ops = [
+                    ['Absensi', 'clipboard-list', 'admin/attendance'],
+                    ['Buat Jadwal', 'calendar', 'admin/schedule'],
+                    ['Lihat Jadwal', 'grid', 'admin/schedule-matrix'],
+                    ['Outlet', 'map-pin', 'admin/outlet'],
+                ];
+                $payroll = [
+                    ['Payroll', 'wallet', 'admin/payroll'],
+                    ['Cuti', 'calendar-off', 'admin/leave'],
+                    ['Lembur', 'timer', 'admin/overtime'],
+                ];
+                $inventory = [['Supplier', 'truck', 'admin/suppliers'], ['History', 'history', 'admin/history']];
+            @endphp
 
-                    General
-                </p>
+            @foreach ([['General', $general], ['Operasional', $ops], ['Payroll', $payroll], ['Inventory', $inventory]] as $group)
+                <div>
+                    <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
+                        {{ $group[0] }}</p>
 
-                @php
-                    $general = [['Dashboard', 'layout-dashboard', 'admin'], ['Data Staff', 'users', 'admin/staff']];
-                @endphp
+                    @foreach ($group[1] as $m)
+                        @php $active=request()->path()===$m[2]; @endphp
 
-                @foreach ($general as $m)
-                    @php $active = request()->path() === $m[2]; @endphp
+                        <a href="/{{ $m[2] }}"
+                            class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl
+{{ $active ? 'menu-active' : 'text-gray-600' }}">
 
-                    <a href="/{{ $m[2] }}"
-                        class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl
-                {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
+                            <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
 
-                        <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
-
-
-                    </a>
-                @endforeach
-            </div>
-
-            {{-- OPERASIONAL --}}
-            <div>
-                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
-
-                    Operasional
-                </p>
-
-                @php
-                    $ops = [
-                        ['Absensi', 'clipboard-list', 'admin/attendance'],
-                        ['Buat Jadwal', 'calendar', 'admin/schedule'],
-                        ['Lihat Jadwal', 'grid', 'admin/schedule-matrix'],
-                        ['Outlet', 'map-pin', 'admin/outlet'],
-                    ];
-                @endphp
-
-                @foreach ($ops as $m)
-                    @php $active = request()->path() === $m[2]; @endphp
-
-                    <a href="/{{ $m[2] }}"
-                        class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl
-                {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
-
-                        <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
-
-
-                    </a>
-                @endforeach
-            </div>
-
-            {{-- PAYROLL --}}
-            <div>
-                <p class="sidebar-section text-xs uppercase tracking-wide text-gray-400 mb-2 px-4">
-
-                    Payroll
-                </p>
-
-                @php
-                    $payroll = [
-                        ['Payroll', 'wallet', 'admin/payroll'],
-                        ['Cuti', 'calendar-off', 'admin/leave'],
-                        ['Lembur', 'clock', 'admin/overtime'],
-                    ];
-                @endphp
-
-                @foreach ($payroll as $m)
-                    @php $active = request()->path() === $m[2]; @endphp
-
-                    <a href="/{{ $m[2] }}"
-                        class="menu-item flex items-center gap-4 px-4 py-3 rounded-xl
-                {{ $active ? 'menu-active' : 'text-gray-600 hover:bg-gray-100' }}">
-
-                        <i data-lucide="{{ $m[1] }}" class="w-5 h-5"></i>
-                        <span class="sidebar-text whitespace-nowrap">{{ $m[0] }}</span>
-
-
-                    </a>
-                @endforeach
-            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endforeach
 
         </nav>
 
-
-        {{-- USER --}}
+        <!-- USER -->
         <div class="p-5 border-t">
 
             <div class="flex items-center gap-4 sidebar-text">
 
                 <div
-                    class="avatar-ring w-11 h-11 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600
+                    class="avatar-ring w-11 h-11 rounded-xl
+bg-gradient-to-br from-green-400 to-emerald-600
 text-white flex items-center justify-center font-bold">
-
                     {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-
                 </div>
 
                 <div>
@@ -190,12 +176,11 @@ text-white flex items-center justify-center font-bold">
 
     </aside>
 
-    {{-- MAIN --}}
+    <!-- ================= MAIN ================= -->
     <div id="wrapper" class="ml-0 md:ml-64 transition-all duration-300">
 
-        <header class="h-16 bg-white border-b flex items-center justify-between px-5 sticky top-0 z-20">
+        <header class="h-16 bg-white flex items-center justify-between px-5 sticky top-0 z-20">
 
-            {{-- LEFT --}}
             <div class="flex items-center gap-4">
 
                 <button id="toggle"
@@ -207,15 +192,13 @@ text-white flex items-center justify-center font-bold">
 
             </div>
 
-            {{-- RIGHT --}}
             <div class="relative">
 
                 <button id="profileBtn"
-                    class="avatar-ring w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600
+                    class="avatar-ring w-9 h-9 rounded-xl
+bg-gradient-to-br from-green-400 to-emerald-600
 text-white flex items-center justify-center">
-
                     <i data-lucide="user" class="w-4 h-4"></i>
-
                 </button>
 
                 <div id="profileMenu"
@@ -238,51 +221,33 @@ text-white flex items-center justify-center">
 
         </header>
 
-
         <main class="p-5 md:p-7">
             @yield('content')
         </main>
 
     </div>
-    <style>
-        /* Hide text + section when collapsed */
-        .collapsed .sidebar-text {
-            display: none;
-        }
-
-        .collapsed .sidebar-section {
-            display: none;
-        }
-
-        /* Center icons when collapsed */
-        .collapsed .menu-item {
-            justify-content: center;
-        }
-
-        .collapsed .menu-item i {
-            margin-right: 0;
-        }
-    </style>
 
     <script>
-        /* ================= PROFILE DROPDOWN ================= */
+        /* PAGE TRANSITION */
+        window.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add("page-loaded")
+        })
+
+        lucide.createIcons()
+
+        /* PROFILE DROPDOWN */
         const profileBtn = document.getElementById('profileBtn')
         const profileMenu = document.getElementById('profileMenu')
 
-        if (profileBtn) {
-            profileBtn.onclick = () => profileMenu.classList.toggle('hidden')
+        profileBtn.onclick = () => profileMenu.classList.toggle('hidden')
 
-            document.addEventListener('click', e => {
-                if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
-                    profileMenu.classList.add('hidden')
-                }
-            })
-        }
+        document.addEventListener('click', e => {
+            if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden')
+            }
+        })
 
-        /* ================= LUCIDE INIT ================= */
-        lucide.createIcons()
-
-        /* ================= SIDEBAR ================= */
+        /* SIDEBAR SYSTEM */
         const sidebar = document.getElementById('sidebar')
         const wrapper = document.getElementById('wrapper')
         const toggle = document.getElementById('toggle')
@@ -295,7 +260,6 @@ text-white flex items-center justify-center">
             return window.innerWidth < 768
         }
 
-        /* Apply current state */
         function syncSidebar() {
 
             if (isMobile()) {
@@ -321,29 +285,21 @@ text-white flex items-center justify-center">
             lucide.createIcons()
         }
 
-        /* Toggle button */
         toggle.onclick = () => {
 
-            /* MOBILE */
             if (isMobile()) {
                 sidebar.classList.toggle('-translate-x-full')
                 overlay.classList.toggle('hidden')
-
-                icon.dataset.lucide = sidebar.classList.contains('-translate-x-full') ?
-                    'menu' :
-                    'x'
-
+                icon.dataset.lucide = sidebar.classList.contains('-translate-x-full') ? 'menu' : 'x'
                 lucide.createIcons()
                 return
             }
 
-            /* DESKTOP */
             collapsed = !collapsed
             localStorage.setItem('sb', collapsed ? '1' : '0')
             syncSidebar()
         }
 
-        /* Overlay click (mobile close) */
         overlay.onclick = () => {
             sidebar.classList.add('-translate-x-full')
             overlay.classList.add('hidden')
@@ -351,18 +307,14 @@ text-white flex items-center justify-center">
             lucide.createIcons()
         }
 
-        /* Resize listener */
         window.addEventListener('resize', syncSidebar)
-
-        /* Initial sync */
         syncSidebar()
 
-        /* ================= PWA ================= */
+        /* PWA */
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("/sw.js")
         }
     </script>
-
 
 </body>
 
